@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Demo Team -->
+        <record id="demo_team_it" model="helpdesk.team">
+            <field name="name">IT Support</field>
+            <field name="assignment_method">round_robin</field>
+            <field name="auto_close_days">7</field>
+            <field name="leader_id" ref="base.user_admin"/>
+        </record>
+
+        <!-- Demo Agents -->
+        <record id="demo_agent_1" model="res.users">
+            <field name="name">Alice Agent</field>
+            <field name="login">alice.agent@example.com</field>
+            <field name="groups_id" eval="[(4, ref('odesk_helpdesk.group_helpdesk_agent'))]"/>
+        </record>
+        <record id="demo_agent_2" model="res.users">
+            <field name="name">Bob Agent</field>
+            <field name="login">bob.agent@example.com</field>
+            <field name="groups_id" eval="[(4, ref('odesk_helpdesk.group_helpdesk_agent'))]"/>
+        </record>
+        <record id="demo_agent_3" model="res.users">
+            <field name="name">Carol Agent</field>
+            <field name="login">carol.agent@example.com</field>
+            <field name="groups_id" eval="[(4, ref('odesk_helpdesk.group_helpdesk_agent'))]"/>
+        </record>
+
+        <!-- Add agents to team -->
+        <record id="demo_team_it" model="helpdesk.team">
+            <field name="member_ids" eval="[(4, ref('demo_agent_1')), (4, ref('demo_agent_2')), (4, ref('demo_agent_3'))]"/>
+        </record>
+
+        <!-- Assign categories to team -->
+        <record id="category_hardware" model="helpdesk.category">
+            <field name="team_id" ref="demo_team_it"/>
+        </record>
+        <record id="category_software" model="helpdesk.category">
+            <field name="team_id" ref="demo_team_it"/>
+        </record>
+        <record id="category_network" model="helpdesk.category">
+            <field name="team_id" ref="demo_team_it"/>
+        </record>
+        <record id="category_access" model="helpdesk.category">
+            <field name="team_id" ref="demo_team_it"/>
+        </record>
+        <record id="category_general" model="helpdesk.category">
+            <field name="team_id" ref="demo_team_it"/>
+        </record>
+
+        <!-- Demo SLA Policies -->
+        <record id="demo_sla_critical" model="helpdesk.sla.policy">
+            <field name="name">Critical Response</field>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">3</field>
+            <field name="time_response">1</field>
+            <field name="time_resolution">4</field>
+            <field name="stage_id" ref="stage_resolved"/>
+        </record>
+
+        <record id="demo_sla_standard" model="helpdesk.sla.policy">
+            <field name="name">Standard Response</field>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">1</field>
+            <field name="time_response">8</field>
+            <field name="time_resolution">48</field>
+            <field name="stage_id" ref="stage_resolved"/>
+        </record>
+
+        <!-- Demo Tickets -->
+        <record id="demo_ticket_01" model="helpdesk.ticket">
+            <field name="name">Laptop not booting</field>
+            <field name="category_id" ref="category_hardware"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">2</field>
+            <field name="stage_id" ref="stage_new"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;My laptop won't boot since this morning. Shows black screen after BIOS.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_ticket_02" model="helpdesk.ticket">
+            <field name="name">Cannot install MS Office update</field>
+            <field name="category_id" ref="category_software"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">1</field>
+            <field name="stage_id" ref="stage_in_progress"/>
+            <field name="user_id" ref="demo_agent_1"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;Stuck at 45% when trying to update MS Office.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_ticket_03" model="helpdesk.ticket">
+            <field name="name">VPN connection drops frequently</field>
+            <field name="category_id" ref="category_network"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">2</field>
+            <field name="stage_id" ref="stage_in_progress"/>
+            <field name="user_id" ref="demo_agent_2"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;VPN disconnects every 10 minutes. Using FortiClient.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_ticket_04" model="helpdesk.ticket">
+            <field name="name">Need access to SharePoint project folder</field>
+            <field name="category_id" ref="category_access"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">1</field>
+            <field name="stage_id" ref="stage_waiting"/>
+            <field name="user_id" ref="demo_agent_1"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;Need read/write access to the Marketing project folder on SharePoint.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_ticket_05" model="helpdesk.ticket">
+            <field name="name">Printer not responding on 3rd floor</field>
+            <field name="category_id" ref="category_hardware"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">1</field>
+            <field name="stage_id" ref="stage_resolved"/>
+            <field name="user_id" ref="demo_agent_3"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;HP LaserJet on 3rd floor shows offline. Already tried power cycle.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_ticket_06" model="helpdesk.ticket">
+            <field name="name">Server room temperature alert</field>
+            <field name="category_id" ref="category_hardware"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">3</field>
+            <field name="stage_id" ref="stage_closed"/>
+            <field name="user_id" ref="demo_agent_2"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;Server room sensors triggered a high-temp alert at 32°C.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_ticket_07" model="helpdesk.ticket">
+            <field name="name">Email not syncing on mobile</field>
+            <field name="category_id" ref="category_software"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">1</field>
+            <field name="stage_id" ref="stage_new"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;Outlook on iPhone stopped syncing after the last update.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_ticket_08" model="helpdesk.ticket">
+            <field name="name">Slow WiFi in meeting room B</field>
+            <field name="category_id" ref="category_network"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">0</field>
+            <field name="stage_id" ref="stage_new"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;WiFi speed drops to 2 Mbps in meeting room B. Other rooms are fine.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_ticket_09" model="helpdesk.ticket">
+            <field name="name">New employee onboarding - account setup</field>
+            <field name="category_id" ref="category_access"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">1</field>
+            <field name="stage_id" ref="stage_in_progress"/>
+            <field name="user_id" ref="demo_agent_3"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;Please set up accounts for new hire starting Monday: email, VPN, Active Directory.&lt;/p&gt;</field>
+        </record>
+
+        <record id="demo_ticket_10" model="helpdesk.ticket">
+            <field name="name">Request for second monitor</field>
+            <field name="category_id" ref="category_general"/>
+            <field name="team_id" ref="demo_team_it"/>
+            <field name="priority">0</field>
+            <field name="stage_id" ref="stage_resolved"/>
+            <field name="user_id" ref="demo_agent_1"/>
+            <field name="partner_id" ref="base.partner_demo"/>
+            <field name="description">&lt;p&gt;Would like a second monitor for my workstation. Approved by my manager.&lt;/p&gt;</field>
+        </record>
+    </data>
+</odoo>

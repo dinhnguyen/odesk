@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="helpdesk_ticket_view_form" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <form string="Helpdesk Ticket">
+                <header>
+                    <button name="action_assign_to_me" type="object"
+                            string="Assign to Me"
+                            class="oe_highlight"
+                            invisible="user_id"
+                            groups="odesk_helpdesk.group_helpdesk_agent"/>
+                    <button name="action_reopen" type="object"
+                            string="Reopen"
+                            invisible="not is_done and not is_close"
+                            groups="odesk_helpdesk.group_helpdesk_agent"/>
+                    <field name="stage_id" widget="statusbar"
+                           options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <field name="is_close" invisible="1"/>
+                    <field name="is_done" invisible="1"/>
+                    <widget name="web_ribbon" title="Closed"
+                            invisible="not is_close"
+                            bg_color="text-bg-secondary"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="number" readonly="1" class="oe_inline"/>
+                            <span> - </span>
+                            <field name="name" placeholder="Subject..." class="oe_inline"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="category_id"/>
+                            <field name="team_id"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="priority" widget="priority"/>
+                            <field name="kanban_state" widget="state_selection"/>
+                            <field name="tag_ids" widget="many2many_tags"
+                                   options="{'color_field': 'color'}"/>
+                            <field name="date_created"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Describe the issue..."/>
+                        </page>
+                        <page string="SLA" groups="odesk_helpdesk.group_helpdesk_agent">
+                            <group>
+                                <group>
+                                    <field name="sla_deadline"/>
+                                    <field name="sla_reached"/>
+                                    <field name="sla_failed"/>
+                                    <field name="is_sla_compliant"/>
+                                </group>
+                                <group>
+                                    <field name="date_assigned"/>
+                                    <field name="date_resolved"/>
+                                    <field name="date_closed"/>
+                                    <field name="resolution_hours"/>
+                                </group>
+                            </group>
+                            <field name="sla_status_ids" readonly="1">
+                                <list>
+                                    <field name="sla_policy_id"/>
+                                    <field name="deadline"/>
+                                    <field name="reached" widget="boolean_toggle"/>
+                                    <field name="failed" widget="boolean_toggle"/>
+                                    <field name="exceeded_hours"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="helpdesk_ticket_view_kanban" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.kanban</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id" class="o_kanban_small_column">
+                <field name="priority"/>
+                <field name="stage_id"/>
+                <field name="user_id"/>
+                <field name="category_id"/>
+                <field name="sla_failed"/>
+                <field name="kanban_state"/>
+                <templates>
+                    <t t-name="card">
+                        <field name="priority" widget="priority"/>
+                        <div class="oe_kanban_details">
+                            <strong>
+                                <field name="number"/>
+                                <span> - </span>
+                                <field name="name"/>
+                            </strong>
+                        </div>
+                        <div class="o_kanban_record_bottom">
+                            <div class="oe_kanban_bottom_left">
+                                <field name="category_id"/>
+                                <span t-if="record.sla_failed.raw_value"
+                                      class="badge text-bg-danger ms-1">SLA</span>
+                            </div>
+                            <div class="oe_kanban_bottom_right">
+                                <field name="user_id" widget="many2one_avatar_user"/>
+                                <field name="kanban_state" widget="state_selection"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="helpdesk_ticket_view_tree" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.tree</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <list string="Helpdesk Tickets" multi_edit="1">
+                <field name="number"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="category_id"/>
+                <field name="team_id"/>
+                <field name="user_id"/>
+                <field name="stage_id"/>
+                <field name="priority" widget="priority"/>
+                <field name="sla_deadline"/>
+                <field name="sla_failed" widget="boolean"/>
+                <field name="date_created"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="helpdesk_ticket_view_search" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.search</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <search string="Search Tickets">
+                <field name="name" string="Subject"/>
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <field name="team_id"/>
+                <field name="category_id"/>
+                <separator/>
+                <filter string="My Tickets" name="my_tickets"
+                        domain="[('user_id', '=', uid)]"/>
+                <filter string="Unassigned" name="unassigned"
+                        domain="[('user_id', '=', False)]"/>
+                <filter string="SLA Failed" name="sla_failed"
+                        domain="[('sla_failed', '=', True)]"/>
+                <filter string="Open" name="open"
+                        domain="[('stage_id.is_close', '=', False)]"/>
+                <separator/>
+                <filter string="High Priority" name="high_priority"
+                        domain="[('priority', 'in', ['2', '3'])]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="group_stage"
+                            context="{'group_by': 'stage_id'}"/>
+                    <filter string="Assigned Agent" name="group_user"
+                            context="{'group_by': 'user_id'}"/>
+                    <filter string="Team" name="group_team"
+                            context="{'group_by': 'team_id'}"/>
+                    <filter string="Category" name="group_category"
+                            context="{'group_by': 'category_id'}"/>
+                    <filter string="Priority" name="group_priority"
+                            context="{'group_by': 'priority'}"/>
+                    <filter string="Created Date" name="group_date"
+                            context="{'group_by': 'date_created:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="helpdesk_ticket_action" model="ir.actions.act_window">
+        <field name="name">Tickets</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="helpdesk_ticket_view_search"/>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+</odoo>

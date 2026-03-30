@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Graph View: Tickets by Category -->
+    <record id="helpdesk_ticket_view_graph" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.graph</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <graph string="Tickets Analysis" type="bar">
+                <field name="category_id"/>
+                <field name="id" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Pivot View: Resolution by Agent/Category -->
+    <record id="helpdesk_ticket_view_pivot" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.pivot</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="arch" type="xml">
+            <pivot string="Tickets Analysis">
+                <field name="user_id" type="row"/>
+                <field name="category_id" type="col"/>
+                <field name="resolution_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="helpdesk_dashboard_action" model="ir.actions.act_window">
+        <field name="name">Dashboard</field>
+        <field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="search_view_id" ref="helpdesk_ticket_view_search"/>
+    </record>
+</odoo>
