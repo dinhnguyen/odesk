@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu -->
+    <menuitem id="helpdesk_menu_root"
+              name="IT Helpdesk"
+              web_icon="odesk_helpdesk,static/description/icon.png"
+              sequence="25"/>
+
+    <!-- Tickets -->
+    <menuitem id="helpdesk_menu_tickets"
+              name="Tickets"
+              parent="helpdesk_menu_root"
+              action="helpdesk_ticket_action"
+              sequence="10"/>
+
+    <!-- Dashboard -->
+    <menuitem id="helpdesk_menu_dashboard"
+              name="Dashboard"
+              parent="helpdesk_menu_root"
+              action="helpdesk_dashboard_action"
+              sequence="20"
+              groups="odesk_helpdesk.group_helpdesk_manager"/>
+
+    <!-- Configuration -->
+    <menuitem id="helpdesk_menu_config"
+              name="Configuration"
+              parent="helpdesk_menu_root"
+              sequence="90"
+              groups="odesk_helpdesk.group_helpdesk_manager"/>
+
+    <menuitem id="helpdesk_menu_config_teams"
+              name="Teams"
+              parent="helpdesk_menu_config"
+              action="helpdesk_team_action"
+              sequence="10"/>
+
+    <menuitem id="helpdesk_menu_config_categories"
+              name="Categories"
+              parent="helpdesk_menu_config"
+              action="helpdesk_category_action"
+              sequence="20"/>
+
+    <menuitem id="helpdesk_menu_config_stages"
+              name="Stages"
+              parent="helpdesk_menu_config"
+              action="helpdesk_stage_action"
+              sequence="30"/>
+
+    <menuitem id="helpdesk_menu_config_sla"
+              name="SLA Policies"
+              parent="helpdesk_menu_config"
+              action="helpdesk_sla_policy_action"
+              sequence="40"/>
+</odoo>
