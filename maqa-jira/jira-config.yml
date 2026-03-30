@@ -1,0 +1,13 @@
+# MAQA Jira Configuration — generated 2026-03-30
+project_key: "DIN"
+board_id: ""
+todo_transition_id: "91"
+in_progress_transition_id: "101"
+in_review_transition_id: "111"
+done_transition_id: "121"
+todo_status: "To Do"
+in_progress_status: "In Progress"
+in_review_status: "Pending"
+done_status: "OBSOLETE"
+issue_type: "Story"
+subtask_type: "Sub-task"
