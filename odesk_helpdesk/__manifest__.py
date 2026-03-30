@@ -15,7 +15,7 @@ Complete IT helpdesk system with:
 - Website portal for ticket submission and tracking
     """,
     'author': 'Định Nguyễn',
-    'website': '',
+    'website': 'https://dinhnn.com',
     'license': 'LGPL-3',
     'depends': ['base', 'mail', 'portal', 'web'],
     'data': [

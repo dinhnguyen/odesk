@@ -2,6 +2,10 @@
 
 A complete IT helpdesk module for Odoo 18.0 with ticket management, SLA tracking, team-based routing, and a self-service portal.
 
+> **This is just a test project for GitHub’s spec-kit, but I’m completely satisfied with it. Even as someone without a strong background in programming or Odoo, I was still able to build a fully working module within 1–2 hours.**
+>
+> **I tested it thoroughly and completely, but you should still check it again during installation :)**
+
 ## Features
 
 ### Ticket Management
