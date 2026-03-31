@@ -4,26 +4,26 @@ on:
   workflow_dispatch:
     inputs:
       head_branch:
-        description: "Nhánh nguồn, ví dụ: feature/login"
+        description: "Source branch, e.g. feature/login"
         required: true
         type: string
       base_branch:
-        description: "Nhánh đích"
+        description: "Target branch"
         required: true
         default: "main"
         type: string
       pr_title:
-        description: "Tiêu đề PR. Để trống sẽ tự sinh"
+        description: "PR title. Leave empty to auto-generate"
         required: false
         default: ""
         type: string
       pr_body:
-        description: "Nội dung PR"
+        description: "PR body"
         required: false
         default: ""
         type: string
       draft:
-        description: "Tạo dưới dạng draft"
+        description: "Create as draft"
         required: true
         default: false
         type: boolean
