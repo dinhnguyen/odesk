@@ -30,6 +30,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   create-pr:
@@ -38,11 +39,11 @@ jobs:
     steps:
       - name: Validate inputs
         shell: bash
+        env:
+          HEAD: ${{ inputs.head_branch }}
+          BASE: ${{ inputs.base_branch }}
         run: |
           set -euo pipefail
-
-          HEAD="${{ inputs.head_branch }}"
-          BASE="${{ inputs.base_branch }}"
 
           if [ -z "$HEAD" ]; then
             echo "head_branch is required"
@@ -63,12 +64,12 @@ jobs:
         shell: bash
         env:
           GH_PAT: ${{ secrets.PR_CREATOR_TOKEN }}
+          HEAD: ${{ inputs.head_branch }}
+          BASE: ${{ inputs.base_branch }}
         run: |
           set -euo pipefail
 
           REPO_URL="https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git"
-          HEAD="${{ inputs.head_branch }}"
-          BASE="${{ inputs.base_branch }}"
 
           if ! git ls-remote --exit-code --heads "$REPO_URL" "$HEAD" >/dev/null 2>&1; then
             echo "Source branch does not exist: $HEAD"
@@ -83,12 +84,15 @@ jobs:
       - name: Check whether an open PR already exists
         id: existing_pr
         uses: actions/github-script@v8
+        env:
+          HEAD: ${{ inputs.head_branch }}
+          BASE: ${{ inputs.base_branch }}
         with:
           github-token: ${{ secrets.PR_CREATOR_TOKEN }}
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-            const head = `${owner}:${{ inputs.head_branch }}`;
-            const base = `${{ inputs.base_branch }}`;
+            const head = `${owner}:${process.env.HEAD}`;
+            const base = process.env.BASE;
 
             const { data } = await github.rest.pulls.list({
               owner,
@@ -117,13 +121,13 @@ jobs:
       - name: Build PR title and body
         id: pr_meta
         shell: bash
+        env:
+          HEAD: ${{ inputs.head_branch }}
+          BASE: ${{ inputs.base_branch }}
+          RAW_TITLE: ${{ inputs.pr_title }}
+          RAW_BODY: ${{ inputs.pr_body }}
         run: |
           set -euo pipefail
-
-          HEAD="${{ inputs.head_branch }}"
-          BASE="${{ inputs.base_branch }}"
-          RAW_TITLE="${{ inputs.pr_title }}"
-          RAW_BODY="${{ inputs.pr_body }}"
 
           to_pretty_text() {
             local text="$1"
@@ -219,16 +223,22 @@ jobs:
       - name: Create pull request
         id: create_pr
         uses: actions/github-script@v8
+        env:
+          PR_TITLE: ${{ steps.pr_meta.outputs.title }}
+          PR_BODY: ${{ steps.pr_meta.outputs.body }}
+          HEAD: ${{ inputs.head_branch }}
+          BASE: ${{ inputs.base_branch }}
+          DRAFT: ${{ inputs.draft }}
         with:
           github-token: ${{ secrets.PR_CREATOR_TOKEN }}
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
 
-            const title = `${{ steps.pr_meta.outputs.title }}`;
-            const body = `${{ steps.pr_meta.outputs.body }}`;
-            const head = `${{ inputs.head_branch }}`;
-            const base = `${{ inputs.base_branch }}`;
-            const draft = `${{ inputs.draft }}` === "true";
+            const title = process.env.PR_TITLE;
+            const body = process.env.PR_BODY;
+            const head = process.env.HEAD;
+            const base = process.env.BASE;
+            const draft = process.env.DRAFT === "true";
 
             const { data } = await github.rest.pulls.create({
               owner,
