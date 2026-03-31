@@ -1,0 +1,104 @@
+      - name: Build PR title and body
+        id: pr_meta
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          HEAD="${{ inputs.head_branch }}"
+          BASE="${{ inputs.base_branch }}"
+          RAW_TITLE="${{ inputs.pr_title }}"
+          RAW_BODY="${{ inputs.pr_body }}"
+
+          to_pretty_text() {
+            local text="$1"
+            text="${text//-/ }"
+            text="${text//_/ }"
+            text="$(echo "$text" | sed 's|/| / |g')"
+            echo "$text"
+          }
+
+          generate_title() {
+            local head="$1"
+            local prefix=""
+            local remainder="$head"
+            local label=""
+
+            if [[ "$head" == */* ]]; then
+              prefix="${head%%/*}"
+              remainder="${head#*/}"
+            fi
+
+            case "$prefix" in
+              feature|feat)
+                label="Feature"
+                ;;
+              bugfix|fix)
+                label="Fix"
+                ;;
+              hotfix)
+                label="Hotfix"
+                ;;
+              release)
+                label="Release"
+                ;;
+              chore)
+                label="Chore"
+                ;;
+              docs|doc)
+                label="Docs"
+                ;;
+              refactor)
+                label="Refactor"
+                ;;
+              perf)
+                label="Performance"
+                ;;
+              test|tests)
+                label="Test"
+                ;;
+              ci)
+                label="CI"
+                ;;
+              build)
+                label="Build"
+                ;;
+              *)
+                label=""
+                ;;
+            esac
+
+            if [ -n "$label" ] && [ "$remainder" != "$head" ]; then
+              remainder="$(to_pretty_text "$remainder")"
+              echo "@coderabbitai ${label}: ${remainder}"
+            else
+              echo "@coderabbitai $(to_pretty_text "$head")"
+            fi
+          }
+
+          if [ -n "$RAW_TITLE" ]; then
+            TITLE="$RAW_TITLE"
+          else
+            TITLE="$(generate_title "$HEAD")"
+          fi
+
+          if [ -n "$RAW_BODY" ]; then
+            BODY="$RAW_BODY"
+          else
+            BODY=$(cat <<EOF
+Auto-created by GitHub Actions.
+
+- Source branch: \`${HEAD}\`
+- Base branch: \`${BASE}\`
+- Generated title: \`${TITLE}\`
+EOF
+)
+          fi
+
+          {
+            echo "title<<EOF"
+            echo "$TITLE"
+            echo "EOF"
+            echo "body<<EOF"
+            echo "$BODY"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
